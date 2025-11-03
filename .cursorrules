@@ -1,0 +1,42 @@
+# Cursor AI Configuration
+
+## Project Context
+React 19 frontend application in cross-repository environment with backend service. Team of 3 co-located developers using comprehensive AI development workflows.
+
+## Core Guidelines
+- Modern React 19 patterns with functional components and hooks
+- Cross-repository integration with backend service
+- Comprehensive testing with Jest and React Testing Library
+- AI-assisted development, code review, and testing workflows
+
+## Documentation References
+- Central Context: `docs/central-context.md`
+- React Patterns: `docs/react-development-guide.md`
+- Code Review: `docs/code-review-standards.md`
+- Testing: `docs/testing-guidelines.md`
+
+## Code Generation Rules
+- Use React 19 functional components with hooks
+- Implement proper TypeScript/JavaScript patterns
+- Generate comprehensive tests alongside code
+- Follow accessibility best practices
+- Include error handling and loading states
+
+## Quality Standards
+- Clean, readable, maintainable code
+- Performance-optimized patterns
+- Cross-repository consistency
+- Comprehensive documentation
+- Thorough test coverage
+
+## Team Workflow
+- Support 3-developer co-located team
+- Enable cross-repository context sharing
+- Facilitate code review and testing processes
+- Maintain documentation consistency
+
+## Integration Focus
+- Backend API integration patterns
+- Shared data model consistency
+- Error handling across repositories
+- End-to-end workflow support

@@ -4,7 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d51da789-3af9-43bb-9790-f18e39c37759" name="Changes" comment="" />
+    <list default="true" id="d51da789-3af9-43bb-9790-f18e39c37759" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.cursorrules" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/copilot-instructions.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ae-toolkit/ai-initializer/build/AI_GAP_ANALYSIS.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ae-toolkit/ai-initializer/build/IMPLEMENTATION_PLAN.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ae-toolkit/ai-initializer/build/INTERACTION_LOG.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ae-toolkit/ai-initializer/build/PROJECT_ANALYSIS.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ae-toolkit/ai-initializer/build/USER_PREFERENCES.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/AI_CONTEXT_MAINTENANCE_WORKFLOW.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/AI_GAP_ANALYSIS.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/CENTRAL_AI_CONTEXT.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/COPILOT_CURSOR_STANDARDS.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/PROJECT_ANALYSIS.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/central-context.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/code-review-standards.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/react-development-guide.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/testing-guidelines.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -53,22 +72,22 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feature/azure-integration",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/Users/managlia/workspace/midwest-7-ui",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/azure-integration&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/managlia/workspace/midwest-7-ui&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="ReactDesignerToolWindowState">
     <option name="myId2Visible">
       <map>
@@ -100,6 +119,7 @@
       <workItem from="1762197700238" duration="1296000" />
       <workItem from="1762202024250" duration="2011000" />
       <workItem from="1762204465226" duration="158000" />
+      <workItem from="1762204638832" duration="1921000" />
     </task>
     <servers />
   </component>
