@@ -53,11 +53,11 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_FLOWER_04053660F }}
           action: "upload"
-          app_location: "/"
+          app_location: "build"  # Changed from "/" to "build"
           api_location: ""
-          output_location: "build"
-          skip_app_build: true  # Skip Oryx build since we already built
-          production_branch: "feature/azure-integration"  # Set the production branch
+          output_location: ""  # Empty because build folder already contains the output
+          skip_app_build: true
+          production_branch: "feature/azure-integration"
           github_id_token: ${{ steps.idtoken.outputs.result }}
 
   close_pull_request_job:
