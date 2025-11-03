@@ -1,3 +1,3 @@
 #!/bin/bash
-npm install
+cd /home/site/wwwroot
 npm start
