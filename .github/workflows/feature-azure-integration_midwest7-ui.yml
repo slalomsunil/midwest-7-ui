@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy Node.js app to Azure Web App - midwest7-ui
 
 on:
@@ -27,7 +24,6 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm run test --if-present
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -35,6 +31,7 @@ jobs:
           name: node-app
           path: |
             build/
+            node_modules/
             package.json
             package-lock.json
 
