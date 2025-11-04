@@ -4,7 +4,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:808
 /**
  * Fetch the hello world greeting from the backend
  * @returns {Promise<{message: string}>} The greeting response
- * @throws {Error} If the request fails or returns an error
+ * @throws {Error} If the request fails or returns an error.
  */
 export async function fetchGreeting() {
   try {
