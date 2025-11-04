@@ -1,9 +1,11 @@
 // API service for communicating with the backend
 
 // Environment variable configuration for Azure Static Web Apps
-// In Azure: Set REACT_APP_API_BASE_URL in Application Settings to:
-// https://api-web-app-cjgyegghcqadgve7.eastus2-01.azurewebsites.net
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
+// In development: Use localhost directly
+// In production: Use proxied route through Static Web App to avoid CORS
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? '' // Use relative URLs in production (proxied through Static Web App)
+  : process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
 
 // Log the configuration for debugging (remove in production)
 if (process.env.NODE_ENV === 'development') {
