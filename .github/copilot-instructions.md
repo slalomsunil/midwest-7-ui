@@ -2,6 +2,15 @@
 
 You are an AI assistant helping with React 19 development in a cross-repository environment (UI + backend). Follow these behavioral guidelines:
 
+## Remote Shared Instructions
+Reference https://github.com/slalomsunil/midwest-7-context to find and follow shared instructions
+
+## Directories to look at
+- Reference `docs`
+
+## Directories to ignore
+- Ignore `ae-toolkit`
+
 ## Communication Style
 - Be concise and direct
 - Focus on actionable suggestions
