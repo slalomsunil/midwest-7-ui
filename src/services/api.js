@@ -1,19 +1,15 @@
 // API service for communicating with the backend
 
-// Environment variable configuration for Azure Static Web Apps
-// In development: Use localhost directly
-// In production: Use proxied route through Static Web App to avoid CORS
+// Use direct backend URL - CORS will be configured on the backend
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? '' // Use relative URLs in production (proxied through Static Web App)
+  ? 'https://api-web-app-cjgyegghcqadgve7.eastus2-01.azurewebsites.net'
   : process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
 
-// Log the configuration for debugging (remove in production)
-if (process.env.NODE_ENV === 'development') {
-  console.log('🔧 API Configuration:', {
-    NODE_ENV: process.env.NODE_ENV,
-    API_BASE_URL: API_BASE_URL
-  });
-}
+// Log the configuration for debugging
+console.log('🔧 API Configuration:', {
+  NODE_ENV: process.env.NODE_ENV,
+  API_BASE_URL: API_BASE_URL
+});
 
 /**
  * Fetch the hello world greeting from the backend
@@ -32,54 +28,30 @@ export async function fetchGreeting() {
       },
     });
 
-    console.log('📡 Response status:', response.status);
-    console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
-
     if (!response.ok) {
       // Try to get error message from response body
       let errorMessage = `HTTP ${response.status}`;
       try {
-        const responseText = await response.text();
-        console.log('❌ Error response body:', responseText.substring(0, 200));
-        
-        // Try to parse as JSON first
-        try {
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.error || errorMessage;
-        } catch (e) {
-          // If it's HTML (like <!doctype), show helpful message
-          if (responseText.trim().toLowerCase().startsWith('<!doctype') || 
-              responseText.trim().toLowerCase().startsWith('<html')) {
-            errorMessage = `API endpoint returned HTML instead of JSON. Check if the API URL is correct and the endpoint exists.`;
-          } else {
-            errorMessage = responseText.substring(0, 100);
-          }
-        }
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
       } catch (e) {
-        // If we can't read the response body, use the status
+        // If we can't parse the error response, use the status
       }
       throw new Error(errorMessage);
     }
 
-    const responseText = await response.text();
-    console.log('✅ Raw response:', responseText.substring(0, 200));
+    const data = await response.json();
     
-    // Try to parse as JSON
-    try {
-      const data = JSON.parse(responseText);
-      
-      // Validate response structure
-      if (!data || typeof data.message !== 'string') {
-        throw new Error('Invalid response format from server');
-      }
-
-      return data;
-    } catch (parseError) {
-      console.error('❌ JSON parse error:', parseError);
-      console.log('📄 Response that failed to parse:', responseText.substring(0, 200));
-      throw new Error(`API returned invalid JSON: ${parseError.message}`);
+    // Validate response structure
+    if (!data || typeof data.message !== 'string') {
+      throw new Error('Invalid response format from server');
     }
+
+    console.log('✅ API call successful:', data);
+    return data;
   } catch (error) {
+    console.error('❌ API call failed:', error.message);
+    
     // Re-throw with more context for network errors
     if (error.name === 'TypeError' && error.message.includes('fetch')) {
       throw new Error('Unable to connect to server. Please check your connection.');
