@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { fetchGreeting } from '../services/api';
+import { fetchGreeting, logoutUser } from '../services/api';
+import { clearSession } from '../services/session';
 import './HomePage.css';
 
-const HomePage = () => {
+const HomePage = ({ user, onLogout }) => {
   const [greeting, setGreeting] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [orientation, setOrientation] = useState('portrait');
 
   const loadGreeting = async () => {
     try {
@@ -14,6 +17,7 @@ const HomePage = () => {
       const response = await fetchGreeting();
       setGreeting(response.message);
     } catch (err) {
+      console.error('HomePage Error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -22,39 +26,99 @@ const HomePage = () => {
 
   useEffect(() => {
     loadGreeting();
+
+    // Mobile and orientation detection
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    const handleOrientationChange = () => {
+      setOrientation(window.innerWidth > window.innerHeight ? 'landscape' : 'portrait');
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleOrientationChange);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
   }, []);
 
   const handleRetry = () => {
     loadGreeting();
   };
 
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Continue with logout even if API call fails
+    } finally {
+      clearSession();
+      if (onLogout) {
+        onLogout();
+      }
+    }
+  };
+
   return (
-    <div className="homepage">
+        <main 
+      className={`home-page ${isMobile ? 'mobile-layout' : 'desktop-layout'}`}
+      role="main"
+      data-high-contrast-ready="true"
+      data-touch-enabled="true" 
+      data-orientation-ready="true"
+      data-orientation={orientation}
+      data-testid="homepage-container"
+    >
+      <div aria-live="polite" id="screen-reader-announcements" className="sr-only">
+        {loading && "Loading new greeting..."}
+        {error && `Error: ${error}`}
+        {greeting && !loading && `New greeting received: ${greeting}`}
+      </div>
       <div className="chat-container">
         <div className="chat-header">
-          <h1 className="app-title">Hello World Chat</h1>
-          <p className="app-subtitle">WhatsApp-style Greeting</p>
+          <div className="header-content">
+            <div className="title-section">
+              <h1 className="app-title">Hello World Chat</h1>
+              <p className="app-subtitle">Welcome, {user?.username || 'User'}!</p>
+            </div>
+            <button 
+              className="logout-button focus-visible"
+              onClick={handleLogout}
+              aria-label={`Logout ${user?.username || 'user'}`}
+              data-touch-enabled="true"
+            >
+              <span className="logout-icon" aria-hidden="true">👋</span>
+              <span className="logout-text">Logout</span>
+            </button>
+          </div>
         </div>
         
         <div className="chat-messages">
           {loading && (
-            <div className="message-bubble loading">
+            <div className="message-bubble loading" role="status" aria-live="polite">
               <div className="loading-dots" data-testid="loading-dots">
                 <span></span>
                 <span></span>
                 <span></span>
               </div>
-              <p className="loading-text">Loading greeting...</p>
+              <p className="loading-text" aria-live="polite">Loading greeting...</p>
             </div>
           )}
           
           {error && (
-            <div className="message-bubble error">
+            <div className="message-bubble error" role="alert" aria-live="assertive">
               <p className="error-text">❌ {error}</p>
               <button 
-                className="retry-button" 
+                className="retry-button focus-visible" 
                 onClick={handleRetry}
                 aria-label="Retry loading greeting"
+                data-touch-enabled="true"
+                onFocus={(e) => e.target.classList.add('focus-visible')}
+                onBlur={(e) => e.target.classList.remove('focus-visible')}
               >
                 🔄 Try Again
               </button>
@@ -62,19 +126,34 @@ const HomePage = () => {
           )}
           
           {!loading && !error && greeting && (
-            <div className="message-bubble success">
-              <p className="greeting-text">👋 {greeting}</p>
+            <div className="message-bubble success" role="region" aria-live="polite">
+              <p className="greeting-text" aria-live="polite" data-high-contrast-ready="true">👋 {greeting}</p>
               <span className="message-time">
                 {new Date().toLocaleTimeString([], { 
                   hour: '2-digit', 
                   minute: '2-digit' 
                 })}
               </span>
+              <button 
+                className="refresh-button focus-visible"
+                onClick={() => {
+                  if (!loading) {
+                    loadGreeting();
+                  }
+                }}
+                disabled={loading}
+                aria-label="Get new greeting"
+                data-touch-enabled="true"
+                onFocus={(e) => e.target.classList.add('focus-visible')}
+                onBlur={(e) => e.target.classList.remove('focus-visible')}
+              >
+                🎲 New Greeting
+              </button>
             </div>
           )}
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

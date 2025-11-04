@@ -49,6 +49,83 @@ export async function fetchGreeting() {
 }
 
 /**
+ * Authenticate user with username-only login
+ * @param {string} username - The username to authenticate
+ * @returns {Promise<{user: Object}>} The authenticated user data
+ * @throws {Error} If authentication fails
+ */
+export async function loginUser(username) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: username.trim() })
+    });
+
+    if (!response.ok) {
+      let errorMessage = `HTTP ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {
+        // If we can't parse the error response, use the status
+      }
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    
+    // Validate response structure
+    if (!data || !data.success || !data.user) {
+      throw new Error('Invalid login response from server');
+    }
+
+    return data;
+  } catch (error) {
+    // Re-throw with more context for network errors
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('Unable to connect to server. Please check your connection.');
+    }
+    throw error;
+  }
+}
+
+/**
+ * Log out the current user
+ * @returns {Promise<void>}
+ * @throws {Error} If logout fails
+ */
+export async function logoutUser() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      let errorMessage = `HTTP ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {
+        // If we can't parse the error response, use the status
+      }
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    // Re-throw with more context for network errors
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('Unable to connect to server. Please check your connection.');
+    }
+    throw error;
+  }
+}
+
+/**
  * Check if the API is available
  * @returns {Promise<boolean>} True if API is responsive, false otherwise
  */
