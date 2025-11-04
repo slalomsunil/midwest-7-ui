@@ -5,17 +5,12 @@
 // https://api-web-app-cjgyegghcqadgve7.eastus2-01.azurewebsites.net
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
 
-// Debug logging to help diagnose environment variable issues
-console.log('🔧 API Configuration Debug:');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('REACT_APP_API_BASE_URL from env:', process.env.REACT_APP_API_BASE_URL);
-console.log('🌐 Using API_BASE_URL:', API_BASE_URL);
-
-// Validate API URL configuration
-if (API_BASE_URL === 'http://localhost:8081' && process.env.NODE_ENV === 'production') {
-  console.warn('⚠️  WARNING: Using localhost API URL in production environment!');
-  console.warn('   Make sure REACT_APP_API_BASE_URL is set in Azure Application Settings');
-  console.warn('   Expected: https://api-web-app-cjgyegghcqadgve7.eastus2-01.azurewebsites.net');
+// Log the configuration for debugging (remove in production)
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔧 API Configuration:', {
+    NODE_ENV: process.env.NODE_ENV,
+    API_BASE_URL: API_BASE_URL
+  });
 }
 
 /**
