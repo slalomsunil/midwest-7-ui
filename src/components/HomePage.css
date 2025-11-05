@@ -1,6 +1,6 @@
 /* WhatsApp-inspired styling for HomePage */
 
-.homepage {
+.home-page {
   min-height: 100vh;
   background: linear-gradient(180deg, #075E54 0%, #128C7E 100%);
   display: flex;
@@ -10,14 +10,33 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.chat-container {
+.home-layout {
+  display: flex;
   width: 100%;
-  max-width: 480px;
+  max-width: 1200px;
+  height: 80vh;
+  min-height: 600px;
   background: #F7F8FA;
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   animation: slideUp 0.3s ease-out;
+}
+
+.users-sidebar {
+  width: 350px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 @keyframes slideUp {
@@ -301,14 +320,29 @@
 }
 
 /* Responsive design */
+@media (max-width: 768px) {
+  .home-layout {
+    flex-direction: column;
+    height: 100vh;
+    max-width: 100%;
+    border-radius: 0;
+  }
+  
+  .users-sidebar {
+    width: 100%;
+    height: 40%;
+    border-bottom: 1px solid #e0e0e0;
+  }
+}
+
 @media (max-width: 480px) {
-  .homepage {
-    padding: 12px;
+  .home-page {
+    padding: 0;
   }
   
   .chat-container {
     max-width: 100%;
-    border-radius: 12px;
+    border-radius: 0;
   }
   
   .chat-header {

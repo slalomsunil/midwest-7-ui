@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { fetchGreeting, logoutUser } from '../services/api';
 import { clearSession } from '../services/session';
+import LoggedInUsersPanel from './LoggedInUsersPanel';
+import { useOnlineUsers } from '../hooks/useOnlineUsers';
 import './HomePage.css';
 
 const HomePage = ({ user, onLogout }) => {
@@ -9,6 +11,9 @@ const HomePage = ({ user, onLogout }) => {
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [orientation, setOrientation] = useState('portrait');
+
+  // Use the online users hook
+  const { users: onlineUsers, loading: usersLoading, error: usersError } = useOnlineUsers(user?.id);
 
   const loadGreeting = async () => {
     try {
@@ -63,8 +68,13 @@ const HomePage = ({ user, onLogout }) => {
     }
   };
 
+  const handleUserClick = (selectedUser) => {
+    console.log('User clicked:', selectedUser);
+    // Future: Initiate chat with selected user
+  };
+
   return (
-        <main 
+    <main 
       className={`home-page ${isMobile ? 'mobile-layout' : 'desktop-layout'}`}
       role="main"
       data-high-contrast-ready="true"
@@ -78,16 +88,28 @@ const HomePage = ({ user, onLogout }) => {
         {error && `Error: ${error}`}
         {greeting && !loading && `New greeting received: ${greeting}`}
       </div>
-      <div className="chat-container">
-        <div className="chat-header">
-          <div className="header-content">
-            <div className="title-section">
-              <h1 className="app-title">Hello World Chat</h1>
-              <p className="app-subtitle">Welcome, {user?.username || 'User'}!</p>
-            </div>
-            <button 
-              className="logout-button focus-visible"
-              onClick={handleLogout}
+      <div className="home-layout">
+        {/* Online Users Panel */}
+        <aside className="users-sidebar">
+          <LoggedInUsersPanel 
+            users={onlineUsers}
+            loading={usersLoading}
+            error={usersError}
+            onUserClick={handleUserClick}
+          />
+        </aside>
+
+        {/* Main Chat Area */}
+        <div className="chat-container">
+          <div className="chat-header">
+            <div className="header-content">
+              <div className="title-section">
+                <h1 className="app-title">Hello World Chat</h1>
+                <p className="app-subtitle">Welcome, {user?.username || 'User'}!</p>
+              </div>
+              <button 
+                className="logout-button focus-visible"
+                onClick={handleLogout}
               aria-label={`Logout ${user?.username || 'user'}`}
               data-touch-enabled="true"
             >
@@ -113,6 +135,7 @@ const HomePage = ({ user, onLogout }) => {
             <div className="message-bubble error" role="alert" aria-live="assertive">
               <p className="error-text">❌ {error}</p>
               <button 
+                type="button"
                 className="retry-button focus-visible" 
                 onClick={handleRetry}
                 aria-label="Retry loading greeting"
@@ -151,6 +174,7 @@ const HomePage = ({ user, onLogout }) => {
               </button>
             </div>
           )}
+        </div>
         </div>
       </div>
     </main>

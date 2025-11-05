@@ -11,7 +11,9 @@ const LoginPage = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!username.trim()) {
+    const trimmedUsername = username.trim();
+    
+    if (!trimmedUsername) {
       setError('Please enter a username');
       return;
     }
@@ -20,7 +22,7 @@ const LoginPage = ({ onLogin }) => {
       setLoading(true);
       setError(null);
       
-      const response = await loginUser(username);
+      const response = await loginUser(trimmedUsername);
       saveSession(response.user);
       
       // Notify parent component of successful login

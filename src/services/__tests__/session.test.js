@@ -6,31 +6,9 @@ import {
   isAuthenticated 
 } from '../session';
 
-// Mock sessionStorage
-const mockSessionStorage = {
-  store: {},
-  getItem: jest.fn((key) => mockSessionStorage.store[key] || null),
-  setItem: jest.fn((key, value) => {
-    mockSessionStorage.store[key] = value;
-  }),
-  removeItem: jest.fn((key) => {
-    delete mockSessionStorage.store[key];
-  }),
-  clear: jest.fn(() => {
-    mockSessionStorage.store = {};
-  })
-};
-
-// Replace sessionStorage with mock
-Object.defineProperty(window, 'sessionStorage', {
-  value: mockSessionStorage,
-  writable: true
-});
-
 describe('Session Management', () => {
   beforeEach(() => {
-    // Clear mock storage and reset mocks before each test
-    mockSessionStorage.clear();
+    // Storage is already mocked and cleared in setupTests.js
     jest.clearAllMocks();
   });
 
@@ -44,19 +22,19 @@ describe('Session Management', () => {
 
       saveSession(userData);
 
-      expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
+      expect(sessionStorage.setItem).toHaveBeenCalledWith(
         'midwest_chat_session',
         expect.stringContaining('"user"')
       );
       
-      const savedData = JSON.parse(mockSessionStorage.store['midwest_chat_session']);
+      const savedData = JSON.parse(sessionStorage._store['midwest_chat_session']);
       expect(savedData.user).toEqual(userData);
       expect(savedData.timestamp).toBeDefined();
     });
 
     it('should handle errors gracefully', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      mockSessionStorage.setItem.mockImplementationOnce(() => {
+      sessionStorage.setItem.mockImplementationOnce(() => {
         throw new Error('Storage quota exceeded');
       });
 
@@ -82,7 +60,7 @@ describe('Session Management', () => {
         timestamp: new Date().toISOString()
       };
       
-      mockSessionStorage.store['midwest_chat_session'] = JSON.stringify(sessionData);
+      sessionStorage._store['midwest_chat_session'] = JSON.stringify(sessionData);
 
       const result = getSession();
       expect(result).toEqual(userData);
@@ -95,7 +73,7 @@ describe('Session Management', () => {
 
     it('should return null when session data is invalid JSON', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      mockSessionStorage.store['midwest_chat_session'] = 'invalid json';
+      sessionStorage._store['midwest_chat_session'] = 'invalid json';
 
       const result = getSession();
       expect(result).toBeNull();
@@ -106,7 +84,7 @@ describe('Session Management', () => {
 
     it('should return null when session data has no user property', () => {
       const sessionData = { timestamp: new Date().toISOString() };
-      mockSessionStorage.store['midwest_chat_session'] = JSON.stringify(sessionData);
+      sessionStorage._store['midwest_chat_session'] = JSON.stringify(sessionData);
 
       const result = getSession();
       expect(result).toBeNull();
@@ -114,7 +92,7 @@ describe('Session Management', () => {
 
     it('should handle storage errors gracefully', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      mockSessionStorage.getItem.mockImplementationOnce(() => {
+      sessionStorage.getItem.mockImplementationOnce(() => {
         throw new Error('Storage error');
       });
 
@@ -129,20 +107,20 @@ describe('Session Management', () => {
   describe('clearSession', () => {
     it('should remove session from sessionStorage', () => {
       // Set up initial session
-      mockSessionStorage.store['midwest_chat_session'] = JSON.stringify({
+      sessionStorage._store['midwest_chat_session'] = JSON.stringify({
         user: { id: 1, username: 'testuser' },
         timestamp: new Date().toISOString()
       });
 
       clearSession();
 
-      expect(mockSessionStorage.removeItem).toHaveBeenCalledWith('midwest_chat_session');
-      expect(mockSessionStorage.store['midwest_chat_session']).toBeUndefined();
+      expect(sessionStorage.removeItem).toHaveBeenCalledWith('midwest_chat_session');
+      expect(sessionStorage._store['midwest_chat_session']).toBeUndefined();
     });
 
     it('should handle errors gracefully', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      mockSessionStorage.removeItem.mockImplementationOnce(() => {
+      sessionStorage.removeItem.mockImplementationOnce(() => {
         throw new Error('Storage error');
       });
 
@@ -159,7 +137,7 @@ describe('Session Management', () => {
         user: { id: 1, username: 'testuser' },
         timestamp: new Date().toISOString()
       };
-      mockSessionStorage.store['midwest_chat_session'] = JSON.stringify(sessionData);
+      sessionStorage._store['midwest_chat_session'] = JSON.stringify(sessionData);
 
       expect(isAuthenticated()).toBe(true);
     });
@@ -169,7 +147,7 @@ describe('Session Management', () => {
     });
 
     it('should return false when session is invalid', () => {
-      mockSessionStorage.store['midwest_chat_session'] = 'invalid json';
+      sessionStorage._store['midwest_chat_session'] = 'invalid json';
       expect(isAuthenticated()).toBe(false);
     });
   });

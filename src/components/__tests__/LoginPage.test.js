@@ -59,19 +59,17 @@ describe('LoginPage Component', () => {
     });
 
     it('should enable submit button when username is entered', async () => {
-      const user = userEvent.setup();
       render(<LoginPage onLogin={mockOnLogin} />);
       
       const usernameInput = screen.getByLabelText('Username');
       const submitButton = screen.getByRole('button', { name: /start chatting/i });
       
-      await user.type(usernameInput, 'testuser');
+      await userEvent.type(usernameInput, 'testuser');
       
       expect(submitButton).toBeEnabled();
     });
 
     it('should show error when submitting empty username', async () => {
-      const user = userEvent.setup();
       render(<LoginPage onLogin={mockOnLogin} />);
       
       const form = screen.getByRole('form');
@@ -84,7 +82,6 @@ describe('LoginPage Component', () => {
     });
 
     it('should clear error when user starts typing', async () => {
-      const user = userEvent.setup();
       render(<LoginPage onLogin={mockOnLogin} />);
       
       const usernameInput = screen.getByLabelText('Username');
@@ -94,13 +91,12 @@ describe('LoginPage Component', () => {
       expect(screen.getByText('Please enter a username')).toBeInTheDocument();
       
       // Start typing
-      await user.type(usernameInput, 't');
+      await userEvent.type(usernameInput, 't');
       
       expect(screen.queryByText('Please enter a username')).not.toBeInTheDocument();
     });
 
     it('should trim whitespace from username', async () => {
-      const user = userEvent.setup();
       mockApi.loginUser.mockResolvedValue({
         success: true,
         user: { id: 1, username: 'testuser' }
@@ -110,7 +106,7 @@ describe('LoginPage Component', () => {
       
       const usernameInput = screen.getByLabelText('Username');
       
-      await user.type(usernameInput, '  testuser  ');
+      await userEvent.type(usernameInput, '  testuser  ');
       fireEvent.submit(screen.getByRole('form'));
       
       await waitFor(() => {
@@ -121,7 +117,6 @@ describe('LoginPage Component', () => {
 
   describe('Login Process', () => {
     it('should handle successful login', async () => {
-      const user = userEvent.setup();
       const mockUserData = {
         id: 1,
         username: 'testuser',
@@ -138,7 +133,7 @@ describe('LoginPage Component', () => {
       const usernameInput = screen.getByLabelText('Username');
       const submitButton = screen.getByRole('button', { name: /start chatting/i });
       
-      await user.type(usernameInput, 'testuser');
+      await userEvent.type(usernameInput, 'testuser');
       fireEvent.submit(screen.getByRole('form'));
       
       // Should show loading state
@@ -153,7 +148,6 @@ describe('LoginPage Component', () => {
     });
 
     it('should handle login API error', async () => {
-      const user = userEvent.setup();
       const consoleError = jest.spyOn(console, 'error').mockImplementation();
       
       mockApi.loginUser.mockRejectedValue(new Error('Username cannot be empty'));
@@ -162,7 +156,7 @@ describe('LoginPage Component', () => {
       
       const usernameInput = screen.getByLabelText('Username');
       
-      await user.type(usernameInput, 'testuser');
+      await userEvent.type(usernameInput, 'testuser');
       fireEvent.submit(screen.getByRole('form'));
       
       await waitFor(() => {
@@ -177,15 +171,13 @@ describe('LoginPage Component', () => {
     });
 
     it('should handle network error', async () => {
-      const user = userEvent.setup();
-      
       mockApi.loginUser.mockRejectedValue(new Error('Unable to connect to server. Please check your connection.'));
       
       render(<LoginPage onLogin={mockOnLogin} />);
       
       const usernameInput = screen.getByLabelText('Username');
       
-      await user.type(usernameInput, 'testuser');
+      await userEvent.type(usernameInput, 'testuser');
       fireEvent.submit(screen.getByRole('form'));
       
       await waitFor(() => {
@@ -196,8 +188,6 @@ describe('LoginPage Component', () => {
 
   describe('Loading States', () => {
     it('should disable form elements during loading', async () => {
-      const user = userEvent.setup();
-      
       // Mock a slow API call
       let resolvePromise;
       const promise = new Promise((resolve) => {
@@ -210,7 +200,7 @@ describe('LoginPage Component', () => {
       const usernameInput = screen.getByLabelText('Username');
       const submitButton = screen.getByRole('button', { name: /start chatting/i });
       
-      await user.type(usernameInput, 'testuser');
+      await userEvent.type(usernameInput, 'testuser');
       fireEvent.submit(screen.getByRole('form'));
       
       // Elements should be disabled during loading
@@ -230,8 +220,6 @@ describe('LoginPage Component', () => {
     });
 
     it('should show loading spinner during login', async () => {
-      const user = userEvent.setup();
-      
       let resolvePromise;
       const promise = new Promise((resolve) => {
         resolvePromise = resolve;
@@ -242,7 +230,7 @@ describe('LoginPage Component', () => {
       
       const usernameInput = screen.getByLabelText('Username');
       
-      await user.type(usernameInput, 'testuser');
+      await userEvent.type(usernameInput, 'testuser');
       fireEvent.submit(screen.getByRole('form'));
       
       expect(screen.getByText('Logging in...')).toBeInTheDocument();
@@ -277,8 +265,6 @@ describe('LoginPage Component', () => {
     });
 
     it('should announce loading state to screen readers', async () => {
-      const user = userEvent.setup();
-      
       let resolvePromise;
       const promise = new Promise((resolve) => {
         resolvePromise = resolve;
@@ -289,7 +275,7 @@ describe('LoginPage Component', () => {
       
       const usernameInput = screen.getByLabelText('Username');
       
-      await user.type(usernameInput, 'testuser');
+      await userEvent.type(usernameInput, 'testuser');
       fireEvent.submit(screen.getByRole('form'));
       
       expect(screen.getByText('Logging in, please wait')).toBeInTheDocument();
@@ -307,8 +293,6 @@ describe('LoginPage Component', () => {
 
   describe('Edge Cases', () => {
     it('should handle missing onLogin prop', async () => {
-      const user = userEvent.setup();
-      
       mockApi.loginUser.mockResolvedValue({
         success: true,
         user: { id: 1, username: 'testuser' }
@@ -318,7 +302,7 @@ describe('LoginPage Component', () => {
       
       const usernameInput = screen.getByLabelText('Username');
       
-      await user.type(usernameInput, 'testuser');
+      await userEvent.type(usernameInput, 'testuser');
       fireEvent.submit(screen.getByRole('form'));
       
       await waitFor(() => {
