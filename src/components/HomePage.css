@@ -424,6 +424,7 @@
   font-weight: 500;
   transition: background-color 0.2s;
   text-align: left;
+  flex-shrink: 0;
 }
 
 .back-button:hover {

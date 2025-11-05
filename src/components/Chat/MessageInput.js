@@ -1,15 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getChatModeById } from '../../utils/chatModes';
 import './MessageInput.css';
 
-const MessageInput = ({ onSendMessage, selectedMode, disabled }) => {
+const MessageInput = ({ onSendMessage, selectedMode, disabled, onTypingStart, onTypingStop }) => {
   const [message, setMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  // Handle typing indicator based on message content
+  useEffect(() => {
+    if (!onTypingStart || !onTypingStop || disabled) {
+      return;
+    }
+
+    const hasContent = message.trim().length > 0;
+
+    if (hasContent && !isTyping) {
+      // Start typing indicator
+      onTypingStart();
+      setIsTyping(true);
+    } else if (!hasContent && isTyping) {
+      // Stop typing indicator
+      onTypingStop();
+      setIsTyping(false);
+    }
+  }, [message, isTyping, onTypingStart, onTypingStop, disabled]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (isTyping && onTypingStop) {
+        onTypingStop();
+      }
+    };
+  }, [isTyping, onTypingStop]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (message.trim() && !disabled) {
       onSendMessage(message);
-      setMessage('');
+      setMessage(''); // This will trigger the useEffect to stop typing indicator
     }
   };
 

@@ -72,7 +72,7 @@ describe('LoginPage Component', () => {
     it('should show error when submitting empty username', async () => {
       render(<LoginPage onLogin={mockOnLogin} />);
       
-      const form = screen.getByRole('form');
+      const form = document.querySelector('.login-form');
       
       // Try to submit with empty username
       fireEvent.submit(form);
@@ -87,7 +87,7 @@ describe('LoginPage Component', () => {
       const usernameInput = screen.getByLabelText('Username');
       
       // Trigger error first
-      fireEvent.submit(screen.getByRole('form'));
+      fireEvent.submit(document.querySelector('.login-form'));
       expect(screen.getByText('Please enter a username')).toBeInTheDocument();
       
       // Start typing
@@ -107,7 +107,7 @@ describe('LoginPage Component', () => {
       const usernameInput = screen.getByLabelText('Username');
       
       await userEvent.type(usernameInput, '  testuser  ');
-      fireEvent.submit(screen.getByRole('form'));
+      fireEvent.submit(document.querySelector('.login-form'));
       
       await waitFor(() => {
         expect(mockApi.loginUser).toHaveBeenCalledWith('testuser');
@@ -134,7 +134,7 @@ describe('LoginPage Component', () => {
       const submitButton = screen.getByRole('button', { name: /start chatting/i });
       
       await userEvent.type(usernameInput, 'testuser');
-      fireEvent.submit(screen.getByRole('form'));
+      fireEvent.submit(document.querySelector('.login-form'));
       
       // Should show loading state
       expect(screen.getByText('Logging in...')).toBeInTheDocument();
@@ -157,7 +157,7 @@ describe('LoginPage Component', () => {
       const usernameInput = screen.getByLabelText('Username');
       
       await userEvent.type(usernameInput, 'testuser');
-      fireEvent.submit(screen.getByRole('form'));
+      fireEvent.submit(document.querySelector('.login-form'));
       
       await waitFor(() => {
         expect(screen.getByText('Username cannot be empty')).toBeInTheDocument();
@@ -178,7 +178,7 @@ describe('LoginPage Component', () => {
       const usernameInput = screen.getByLabelText('Username');
       
       await userEvent.type(usernameInput, 'testuser');
-      fireEvent.submit(screen.getByRole('form'));
+      fireEvent.submit(document.querySelector('.login-form'));
       
       await waitFor(() => {
         expect(screen.getByText('Unable to connect to server. Please check your connection.')).toBeInTheDocument();
@@ -201,7 +201,7 @@ describe('LoginPage Component', () => {
       const submitButton = screen.getByRole('button', { name: /start chatting/i });
       
       await userEvent.type(usernameInput, 'testuser');
-      fireEvent.submit(screen.getByRole('form'));
+      fireEvent.submit(document.querySelector('.login-form'));
       
       // Elements should be disabled during loading
       expect(usernameInput).toBeDisabled();
@@ -231,7 +231,7 @@ describe('LoginPage Component', () => {
       const usernameInput = screen.getByLabelText('Username');
       
       await userEvent.type(usernameInput, 'testuser');
-      fireEvent.submit(screen.getByRole('form'));
+      fireEvent.submit(document.querySelector('.login-form'));
       
       expect(screen.getByText('Logging in...')).toBeInTheDocument();
       expect(document.querySelector('.loading-spinner')).toBeInTheDocument();
@@ -254,7 +254,7 @@ describe('LoginPage Component', () => {
       const usernameInput = screen.getByLabelText('Username');
       
       // Trigger error
-      fireEvent.submit(screen.getByRole('form'));
+      fireEvent.submit(document.querySelector('.login-form'));
       
       await waitFor(() => {
         expect(usernameInput).toHaveAttribute('aria-invalid', 'true');
@@ -276,7 +276,7 @@ describe('LoginPage Component', () => {
       const usernameInput = screen.getByLabelText('Username');
       
       await userEvent.type(usernameInput, 'testuser');
-      fireEvent.submit(screen.getByRole('form'));
+      fireEvent.submit(document.querySelector('.login-form'));
       
       expect(screen.getByText('Logging in, please wait')).toBeInTheDocument();
       
@@ -303,7 +303,7 @@ describe('LoginPage Component', () => {
       const usernameInput = screen.getByLabelText('Username');
       
       await userEvent.type(usernameInput, 'testuser');
-      fireEvent.submit(screen.getByRole('form'));
+      fireEvent.submit(document.querySelector('.login-form'));
       
       await waitFor(() => {
         expect(mockApi.loginUser).toHaveBeenCalled();
@@ -323,7 +323,7 @@ describe('LoginPage Component', () => {
     it('should have proper form attributes', () => {
       render(<LoginPage onLogin={mockOnLogin} />);
       
-      const form = screen.getByRole('form');
+      const form = document.querySelector('.login-form');
       expect(form).toHaveAttribute('noValidate');
       
       const usernameInput = screen.getByLabelText('Username');

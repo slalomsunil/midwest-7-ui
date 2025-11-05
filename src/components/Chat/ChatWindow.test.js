@@ -113,8 +113,9 @@ describe('ChatWindow Component', () => {
     
     unmount();
     
-    expect(socket.off).toHaveBeenCalledWith('connect');
-    expect(socket.off).toHaveBeenCalledWith('disconnect');
-    expect(socket.disconnect).toHaveBeenCalled();
+    // Verify all event listeners are removed on unmount
+    expect(socket.off).toHaveBeenCalledTimes(9);
+    // Note: We no longer call socket.disconnect() - socket is shared across app
+    expect(socket.disconnect).not.toHaveBeenCalled();
   });
 });

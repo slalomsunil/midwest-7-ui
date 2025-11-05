@@ -3,6 +3,7 @@ import socket from '../../services/socketService';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import ChatModeSelector from './ChatModeSelector';
+import TypingIndicator from './TypingIndicator';
 import { API_BASE_URL } from '../../utils/apiConfig';
 import './ChatWindow.css';
 
@@ -11,6 +12,7 @@ const ChatWindow = ({ currentUser, chatPartner }) => {
   const [selectedMode, setSelectedMode] = useState('pirate');
   const [isConnected, setIsConnected] = useState(false);
   const [isPartnerOnline, setIsPartnerOnline] = useState(false);
+  const [isPartnerTyping, setIsPartnerTyping] = useState(false);
 
   useEffect(() => {
     // Load existing messages from backend
@@ -109,6 +111,19 @@ const ChatWindow = ({ currentUser, chatPartner }) => {
       }
     };
 
+    // Handle typing indicators
+    const onUserTyping = (data) => {
+      if (data.userId === chatPartner.id) {
+        setIsPartnerTyping(true);
+      }
+    };
+
+    const onUserStoppedTyping = (data) => {
+      if (data.userId === chatPartner.id) {
+        setIsPartnerTyping(false);
+      }
+    };
+
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on('new-message', onNewMessage);
@@ -116,6 +131,8 @@ const ChatWindow = ({ currentUser, chatPartner }) => {
     socket.on('message-error', onMessageError);
     socket.on('user-online', onUserOnline);
     socket.on('user-offline', onUserOffline);
+    socket.on('user-typing', onUserTyping);
+    socket.on('user-stopped-typing', onUserStoppedTyping);
 
     // Set initial connection state
     setIsConnected(socket.connected);
@@ -129,6 +146,8 @@ const ChatWindow = ({ currentUser, chatPartner }) => {
       socket.off('message-error', onMessageError);
       socket.off('user-online', onUserOnline);
       socket.off('user-offline', onUserOffline);
+      socket.off('user-typing', onUserTyping);
+      socket.off('user-stopped-typing', onUserStoppedTyping);
       // Don't disconnect - socket is shared across app
     };
   }, [currentUser.id, chatPartner.id]);
@@ -160,6 +179,21 @@ const ChatWindow = ({ currentUser, chatPartner }) => {
     setSelectedMode(mode);
   };
 
+  const handleTypingStart = () => {
+    socket.emit('typing-start', {
+      senderId: currentUser.id,
+      receiverId: chatPartner.id,
+      username: currentUser.username
+    });
+  };
+
+  const handleTypingStop = () => {
+    socket.emit('typing-stop', {
+      senderId: currentUser.id,
+      receiverId: chatPartner.id
+    });
+  };
+
   return (
     <div className="chat-window">
       <div className="chat-header">
@@ -180,10 +214,16 @@ const ChatWindow = ({ currentUser, chatPartner }) => {
         currentUserId={currentUser.id} 
       />
       
+      {isPartnerTyping && (
+        <TypingIndicator username={chatPartner.username} />
+      )}
+      
       <MessageInput 
         onSendMessage={handleSendMessage}
         selectedMode={selectedMode}
         disabled={!isConnected}
+        onTypingStart={handleTypingStart}
+        onTypingStop={handleTypingStop}
       />
       
       {!isConnected && (
