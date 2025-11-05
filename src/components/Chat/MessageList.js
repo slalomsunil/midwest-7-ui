@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './MessageList.css';
 
 const MessageList = ({ messages, currentUserId }) => {
   const messagesEndRef = useRef(null);
+  const [showingOriginal, setShowingOriginal] = useState(new Set());
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -17,17 +18,40 @@ const MessageList = ({ messages, currentUserId }) => {
     });
   };
 
+  const toggleMessageView = (messageId) => {
+    setShowingOriginal(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(messageId)) {
+        newSet.delete(messageId);
+      } else {
+        newSet.add(messageId);
+      }
+      return newSet;
+    });
+  };
+
   const renderMessage = (message, index) => {
     const isSentByMe = message.senderId === currentUserId;
     const messageClass = isSentByMe ? 'message sent' : 'message received';
+    const isShowingOriginal = showingOriginal.has(message.id || index);
+    const hasTransformation = message.original && message.transformed && message.original !== message.transformed;
 
     return (
       <div key={message.id || index} className={messageClass}>
         <div className="message-content">
           <div className="message-text transformed">
-            {message.transformed}
+            {isShowingOriginal ? message.original : message.transformed}
           </div>
-          {isSentByMe && message.original && message.original !== message.transformed && (
+          {hasTransformation && (
+            <button 
+              className="toggle-message-btn"
+              onClick={() => toggleMessageView(message.id || index)}
+              aria-label={isShowingOriginal ? "See transformed message" : "See original message"}
+            >
+              {isShowingOriginal ? '↩ See transformed' : '👁 See original'}
+            </button>
+          )}
+          {isSentByMe && message.original && message.original !== message.transformed && !hasTransformation && (
             <div className="message-text original">
               Original: {message.original}
             </div>

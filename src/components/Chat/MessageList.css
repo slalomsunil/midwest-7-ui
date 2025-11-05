@@ -70,6 +70,28 @@
   font-style: italic;
 }
 
+.toggle-message-btn {
+  background: none;
+  border: none;
+  color: #075e54;
+  font-size: 11px;
+  padding: 4px 8px;
+  cursor: pointer;
+  text-align: left;
+  font-weight: 500;
+  transition: opacity 0.2s;
+  margin-bottom: 4px;
+}
+
+.toggle-message-btn:hover {
+  opacity: 0.7;
+  text-decoration: underline;
+}
+
+.toggle-message-btn:active {
+  opacity: 0.5;
+}
+
 .message-meta {
   display: flex;
   justify-content: space-between;
