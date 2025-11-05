@@ -94,16 +94,19 @@ export async function loginUser(username) {
 
 /**
  * Log out the current user
+ * @param {number} userId - The ID of the user logging out
+ * @param {string} username - The username of the user logging out
  * @returns {Promise<void>}
  * @throws {Error} If logout fails
  */
-export async function logoutUser() {
+export async function logoutUser(userId, username) {
   try {
     const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-      }
+      },
+      body: JSON.stringify({ userId, username })
     });
 
     if (!response.ok) {
@@ -122,6 +125,47 @@ export async function logoutUser() {
       throw new Error('Unable to connect to server. Please check your connection.');
     }
     throw error;
+  }
+}
+
+/**
+ * Log out user using sendBeacon for reliable cleanup during page unload
+ * This is non-blocking and works even when the page is closing
+ * @param {number} userId - The ID of the user logging out
+ * @param {string} username - The username of the user logging out
+ * @returns {boolean} True if beacon was queued successfully
+ */
+export function logoutUserBeacon(userId, username) {
+  if (!userId && !username) {
+    return false;
+  }
+
+  const url = `${API_BASE_URL}/api/auth/logout`;
+  const data = JSON.stringify({ userId, username });
+
+  // Use sendBeacon if available (modern browsers)
+  if (navigator.sendBeacon) {
+    try {
+      // sendBeacon requires a Blob for JSON data
+      const blob = new Blob([data], { type: 'application/json' });
+      return navigator.sendBeacon(url, blob);
+    } catch (error) {
+      console.error('Beacon logout failed:', error);
+      return false;
+    }
+  }
+
+  // Fallback for browsers without sendBeacon support
+  // Use synchronous XHR as last resort (deprecated but works during unload)
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url, false); // false = synchronous
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(data);
+    return xhr.status === 200;
+  } catch (error) {
+    console.error('XHR logout fallback failed:', error);
+    return false;
   }
 }
 

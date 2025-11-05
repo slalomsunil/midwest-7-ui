@@ -517,13 +517,16 @@ describe('API Service', () => {
   });
 
   describe('logoutUser', () => {
-    it('should logout user successfully', async () => {
+    it('should logout user successfully with userId', async () => {
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true }),
       });
 
-      await expect(logoutUser()).resolves.not.toThrow();
+      const userId = 123;
+      const username = 'testuser';
+
+      await expect(logoutUser(userId, username)).resolves.not.toThrow();
 
       expect(fetch).toHaveBeenCalledWith(
         'http://localhost:8081/api/auth/logout',
@@ -531,7 +534,52 @@ describe('API Service', () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-          }
+          },
+          body: JSON.stringify({ userId, username })
+        }
+      );
+    });
+
+    it('should logout user successfully with only userId', async () => {
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true }),
+      });
+
+      const userId = 456;
+
+      await expect(logoutUser(userId)).resolves.not.toThrow();
+
+      expect(fetch).toHaveBeenCalledWith(
+        'http://localhost:8081/api/auth/logout',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId, username: undefined })
+        }
+      );
+    });
+
+    it('should logout user successfully with user object', async () => {
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true }),
+      });
+
+      const user = { id: 789, username: 'objectuser' };
+
+      await expect(logoutUser(user.id, user.username)).resolves.not.toThrow();
+
+      expect(fetch).toHaveBeenCalledWith(
+        'http://localhost:8081/api/auth/logout',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user.id, username: user.username })
         }
       );
     });
@@ -543,7 +591,7 @@ describe('API Service', () => {
         json: async () => ({ error: 'Internal server error' }),
       });
 
-      await expect(logoutUser()).rejects.toThrow('Internal server error');
+      await expect(logoutUser(123, 'testuser')).rejects.toThrow('Internal server error');
     });
 
     it('should throw error on HTTP error without JSON error message', async () => {
@@ -553,13 +601,13 @@ describe('API Service', () => {
         json: async () => { throw new Error('Invalid JSON'); },
       });
 
-      await expect(logoutUser()).rejects.toThrow('HTTP 403');
+      await expect(logoutUser(123, 'testuser')).rejects.toThrow('HTTP 403');
     });
 
     it('should handle network errors', async () => {
       fetch.mockRejectedValueOnce(new TypeError('Failed to fetch'));
 
-      await expect(logoutUser()).rejects.toThrow('Unable to connect to server. Please check your connection.');
+      await expect(logoutUser(123, 'testuser')).rejects.toThrow('Unable to connect to server. Please check your connection.');
     });
 
     it('should not require response body for successful logout', async () => {
@@ -568,7 +616,163 @@ describe('API Service', () => {
         json: async () => ({}), // Empty response is fine for logout
       });
 
+      await expect(logoutUser(123, 'testuser')).resolves.not.toThrow();
+    });
+
+    it('should handle logout without user data gracefully', async () => {
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true }),
+      });
+
+      // Should not crash even if no userId/username provided
       await expect(logoutUser()).resolves.not.toThrow();
+
+      expect(fetch).toHaveBeenCalledWith(
+        'http://localhost:8081/api/auth/logout',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: undefined, username: undefined })
+        }
+      );
+    });
+  });
+
+  describe('logoutUserBeacon', () => {
+    let mockSendBeacon;
+    let originalSendBeacon;
+
+    beforeEach(() => {
+      // Mock sendBeacon
+      originalSendBeacon = navigator.sendBeacon;
+      mockSendBeacon = jest.fn();
+      navigator.sendBeacon = mockSendBeacon;
+    });
+
+    afterEach(() => {
+      // Restore original sendBeacon
+      navigator.sendBeacon = originalSendBeacon;
+    });
+
+    it('should use sendBeacon when available', () => {
+      const { logoutUserBeacon } = require('../api');
+      
+      mockSendBeacon.mockReturnValueOnce(true);
+
+      const result = logoutUserBeacon(123, 'testuser');
+
+      expect(result).toBe(true);
+      expect(mockSendBeacon).toHaveBeenCalledWith(
+        'http://localhost:8081/api/auth/logout',
+        expect.any(Blob)
+      );
+
+      // Verify Blob content
+      const call = mockSendBeacon.mock.calls[0];
+      const blob = call[1];
+      expect(blob.type).toBe('application/json');
+    });
+
+    it('should return false when no user data provided', () => {
+      const { logoutUserBeacon } = require('../api');
+
+      const result = logoutUserBeacon();
+
+      expect(result).toBe(false);
+      expect(mockSendBeacon).not.toHaveBeenCalled();
+    });
+
+    it('should return false when only undefined values provided', () => {
+      const { logoutUserBeacon } = require('../api');
+
+      const result = logoutUserBeacon(undefined, undefined);
+
+      expect(result).toBe(false);
+      expect(mockSendBeacon).not.toHaveBeenCalled();
+    });
+
+    it('should work with only userId', () => {
+      const { logoutUserBeacon } = require('../api');
+      
+      mockSendBeacon.mockReturnValueOnce(true);
+
+      const result = logoutUserBeacon(456);
+
+      expect(result).toBe(true);
+      expect(mockSendBeacon).toHaveBeenCalled();
+    });
+
+    it('should work with only username', () => {
+      const { logoutUserBeacon } = require('../api');
+      
+      mockSendBeacon.mockReturnValueOnce(true);
+
+      const result = logoutUserBeacon(undefined, 'testuser');
+
+      expect(result).toBe(true);
+      expect(mockSendBeacon).toHaveBeenCalled();
+    });
+
+    it('should handle sendBeacon errors gracefully', () => {
+      const { logoutUserBeacon } = require('../api');
+      const consoleError = jest.spyOn(console, 'error').mockImplementation();
+      
+      mockSendBeacon.mockImplementationOnce(() => {
+        throw new Error('Beacon failed');
+      });
+
+      const result = logoutUserBeacon(123, 'testuser');
+
+      expect(result).toBe(false);
+      expect(consoleError).toHaveBeenCalledWith('Beacon logout failed:', expect.any(Error));
+      
+      consoleError.mockRestore();
+    });
+
+    it('should fallback to XHR when sendBeacon not available', () => {
+      const { logoutUserBeacon } = require('../api');
+      
+      // Remove sendBeacon
+      navigator.sendBeacon = undefined;
+
+      // Mock XMLHttpRequest
+      const mockXHR = {
+        open: jest.fn(),
+        setRequestHeader: jest.fn(),
+        send: jest.fn(),
+        status: 200
+      };
+      global.XMLHttpRequest = jest.fn(() => mockXHR);
+
+      const result = logoutUserBeacon(123, 'testuser');
+
+      expect(result).toBe(true);
+      expect(mockXHR.open).toHaveBeenCalledWith('POST', 'http://localhost:8081/api/auth/logout', false);
+      expect(mockXHR.setRequestHeader).toHaveBeenCalledWith('Content-Type', 'application/json');
+      expect(mockXHR.send).toHaveBeenCalledWith(JSON.stringify({ userId: 123, username: 'testuser' }));
+    });
+
+    it('should handle XHR fallback errors gracefully', () => {
+      const { logoutUserBeacon } = require('../api');
+      const consoleError = jest.spyOn(console, 'error').mockImplementation();
+      
+      // Remove sendBeacon
+      navigator.sendBeacon = undefined;
+
+      // Mock XMLHttpRequest that throws
+      global.XMLHttpRequest = jest.fn(() => {
+        throw new Error('XHR failed');
+      });
+
+      const result = logoutUserBeacon(123, 'testuser');
+
+      expect(result).toBe(false);
+      expect(consoleError).toHaveBeenCalledWith('XHR logout fallback failed:', expect.any(Error));
+      
+      consoleError.mockRestore();
     });
   });
 

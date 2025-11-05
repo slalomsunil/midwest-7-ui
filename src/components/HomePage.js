@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchGreeting, logoutUser } from '../services/api';
+import { fetchGreeting, logoutUser, logoutUserBeacon } from '../services/api';
 import { clearSession } from '../services/session';
 import LoggedInUsersPanel from './LoggedInUsersPanel';
 import { useOnlineUsers } from '../hooks/useOnlineUsers';
@@ -50,13 +50,30 @@ const HomePage = ({ user, onLogout }) => {
     };
   }, []);
 
+  // Handle browser/tab close - mark user offline
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Use sendBeacon for reliable logout during page unload
+      if (user?.id || user?.username) {
+        logoutUserBeacon(user.id, user.username);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [user]);
+
   const handleRetry = () => {
     loadGreeting();
   };
 
   const handleLogout = async () => {
     try {
-      await logoutUser();
+      // Pass user data to logout endpoint so backend can mark user offline
+      await logoutUser(user?.id, user?.username);
     } catch (error) {
       console.error('Logout error:', error);
       // Continue with logout even if API call fails

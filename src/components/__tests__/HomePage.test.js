@@ -512,7 +512,7 @@ describe('HomePage', () => {
       fireEvent.click(logoutButton);
 
       await waitFor(() => {
-        expect(mockLogoutUser).toHaveBeenCalled();
+        expect(mockLogoutUser).toHaveBeenCalledWith(mockUser.id, mockUser.username);
         expect(mockClearSession).toHaveBeenCalled();
         expect(mockOnLogout).toHaveBeenCalled();
       });
@@ -570,6 +570,53 @@ describe('HomePage', () => {
       });
 
       // Should not throw error even without onLogout callback
+    });
+  });
+
+  describe('Browser close/tab close handling', () => {
+    it('should register beforeunload event listener', () => {
+      mockFetchGreeting.mockResolvedValueOnce({ message: 'Hello World' });
+      
+      const addEventListenerSpy = jest.spyOn(window, 'addEventListener');
+      
+      render(<HomePage user={mockUser} onLogout={mockOnLogout} />);
+
+      // Verify beforeunload listener was added
+      const beforeunloadCalls = addEventListenerSpy.mock.calls.filter(
+        call => call[0] === 'beforeunload'
+      );
+      expect(beforeunloadCalls.length).toBeGreaterThan(0);
+      expect(beforeunloadCalls[0][1]).toBeInstanceOf(Function);
+
+      addEventListenerSpy.mockRestore();
+    });
+
+    it('should remove beforeunload listener on unmount', () => {
+      mockFetchGreeting.mockResolvedValueOnce({ message: 'Hello World' });
+      
+      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+      
+      const { unmount } = render(<HomePage user={mockUser} onLogout={mockOnLogout} />);
+
+      // Unmount component
+      unmount();
+
+      // Verify beforeunload listener was removed
+      const beforeunloadCalls = removeEventListenerSpy.mock.calls.filter(
+        call => call[0] === 'beforeunload'
+      );
+      expect(beforeunloadCalls.length).toBeGreaterThan(0);
+
+      removeEventListenerSpy.mockRestore();
+    });
+
+    it('should handle beforeunload without user gracefully', () => {
+      mockFetchGreeting.mockResolvedValueOnce({ message: 'Hello World' });
+      
+      // Should not throw even if user is null
+      expect(() => {
+        render(<HomePage user={null} onLogout={mockOnLogout} />);
+      }).not.toThrow();
     });
   });
 
