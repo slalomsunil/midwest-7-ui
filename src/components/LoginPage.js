@@ -60,7 +60,7 @@ const LoginPage = ({ onLogin }) => {
         </div>
 
         {/* Login Form */}
-        <form role="form" onSubmit={handleSubmit} className="login-form" noValidate>
+        <form onSubmit={handleSubmit} className="login-form" noValidate>
           <div className="form-group">
             <label htmlFor="username" className="form-label">
               Username
