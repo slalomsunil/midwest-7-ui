@@ -405,3 +405,32 @@
     color: #A8E6CF;
   }
 }
+
+/* Chat Window Integration */
+.chat-window-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.back-button {
+  background-color: #075e54;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  text-align: left;
+}
+
+.back-button:hover {
+  background-color: #128c7e;
+}
+
+.back-button:focus {
+  outline: 2px solid #25d366;
+  outline-offset: 2px;
+}

@@ -3,6 +3,7 @@ import { fetchGreeting, logoutUser, logoutUserBeacon } from '../services/api';
 import { clearSession } from '../services/session';
 import LoggedInUsersPanel from './LoggedInUsersPanel';
 import { useOnlineUsers } from '../hooks/useOnlineUsers';
+import { ChatWindow } from './Chat';
 import './HomePage.css';
 
 const HomePage = ({ user, onLogout }) => {
@@ -11,6 +12,7 @@ const HomePage = ({ user, onLogout }) => {
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [orientation, setOrientation] = useState('portrait');
+  const [selectedChatUser, setSelectedChatUser] = useState(null);
 
   // Use the online users hook
   const { users: onlineUsers, loading: usersLoading, error: usersError } = useOnlineUsers(user?.id);
@@ -87,7 +89,11 @@ const HomePage = ({ user, onLogout }) => {
 
   const handleUserClick = (selectedUser) => {
     console.log('User clicked:', selectedUser);
-    // Future: Initiate chat with selected user
+    setSelectedChatUser(selectedUser);
+  };
+
+  const handleCloseChat = () => {
+    setSelectedChatUser(null);
   };
 
   return (
@@ -118,23 +124,39 @@ const HomePage = ({ user, onLogout }) => {
 
         {/* Main Chat Area */}
         <div className="chat-container">
-          <div className="chat-header">
-            <div className="header-content">
-              <div className="title-section">
-                <h1 className="app-title">Hello World Chat</h1>
-                <p className="app-subtitle">Welcome, {user?.username || 'User'}!</p>
-              </div>
+          {selectedChatUser ? (
+            <div className="chat-window-wrapper">
               <button 
-                className="logout-button focus-visible"
-                onClick={handleLogout}
-              aria-label={`Logout ${user?.username || 'user'}`}
-              data-touch-enabled="true"
-            >
-              <span className="logout-icon" aria-hidden="true">👋</span>
-              <span className="logout-text">Logout</span>
-            </button>
-          </div>
-        </div>
+                className="back-button"
+                onClick={handleCloseChat}
+                aria-label="Back to greeting"
+              >
+                ← Back
+              </button>
+              <ChatWindow 
+                currentUser={user}
+                chatPartner={selectedChatUser}
+              />
+            </div>
+          ) : (
+            <>
+              <div className="chat-header">
+                <div className="header-content">
+                  <div className="title-section">
+                    <h1 className="app-title">Hello World Chat</h1>
+                    <p className="app-subtitle">Welcome, {user?.username || 'User'}!</p>
+                  </div>
+                  <button 
+                    className="logout-button focus-visible"
+                    onClick={handleLogout}
+                    aria-label={`Logout ${user?.username || 'user'}`}
+                    data-touch-enabled="true"
+                  >
+                    <span className="logout-icon" aria-hidden="true">👋</span>
+                    <span className="logout-text">Logout</span>
+                  </button>
+                </div>
+              </div>
         
         <div className="chat-messages">
           {loading && (
@@ -192,6 +214,8 @@ const HomePage = ({ user, onLogout }) => {
             </div>
           )}
         </div>
+            </>
+          )}
         </div>
       </div>
     </main>
