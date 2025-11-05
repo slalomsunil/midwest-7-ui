@@ -3,6 +3,7 @@ import socket from '../../services/socketService';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import ChatModeSelector from './ChatModeSelector';
+import { API_BASE_URL } from '../../utils/apiConfig';
 import './ChatWindow.css';
 
 const ChatWindow = ({ currentUser, chatPartner }) => {
@@ -15,7 +16,7 @@ const ChatWindow = ({ currentUser, chatPartner }) => {
     // Load existing messages from backend
     const loadMessages = async () => {
       try {
-        const response = await fetch(`http://localhost:8081/api/chat/messages?userId=${currentUser.id}&partnerId=${chatPartner.id}`);
+        const response = await fetch(`${API_BASE_URL}/api/chat/messages?userId=${currentUser.id}&partnerId=${chatPartner.id}`);
         if (response.ok) {
           const data = await response.json();
           setMessages(data.messages || []);
@@ -28,7 +29,7 @@ const ChatWindow = ({ currentUser, chatPartner }) => {
     // Check partner's online status
     const checkPartnerStatus = async () => {
       try {
-        const response = await fetch(`http://localhost:8081/api/users/${chatPartner.id}`);
+        const response = await fetch(`${API_BASE_URL}/api/users/${chatPartner.id}`);
         if (response.ok) {
           const data = await response.json();
           setIsPartnerOnline(data.is_online === 1);
