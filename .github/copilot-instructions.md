@@ -53,6 +53,19 @@ Reference https://github.com/slalomsunil/midwest-7-context to find and follow sh
 - Explain reasoning when suggesting complex patterns
 - Reference project documentation when relevant
 
+### Architecture Diagram Maintenance
+- **ALWAYS review architecture diagrams** when a story is completed
+- Check if changes impact any of the C4 levels (System Context, Container, Component, Code)
+- **REQUIRED**: Get user confirmation before updating architecture diagrams
+- Update relevant C4 diagram files if:
+  - New containers or components are added
+  - External system integrations change
+  - Communication patterns or protocols change
+  - Deployment architecture changes
+- Keep diagrams synchronized across all three repositories (context, service, ui)
+- Ensure Mermaid syntax remains valid after updates
+- Reference the C4 model hierarchy: C1 (System Context) → C2 (Container) → C3 (Component) → C4 (Code)
+
 ## Code Generation Guidelines
 - Generate modern React 19 functional components
 - Use hooks appropriately (useState, useEffect, custom hooks)
