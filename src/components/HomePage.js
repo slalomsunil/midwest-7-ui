@@ -4,6 +4,7 @@ import { clearSession } from '../services/session';
 import LoggedInUsersPanel from './LoggedInUsersPanel';
 import { useOnlineUsers } from '../hooks/useOnlineUsers';
 import { ChatWindow } from './Chat';
+import socketService from '../services/socketService';
 import './HomePage.css';
 
 const HomePage = ({ user, onLogout }) => {
@@ -16,6 +17,26 @@ const HomePage = ({ user, onLogout }) => {
 
   // Use the online users hook
   const { users: onlineUsers, loading: usersLoading, error: usersError } = useOnlineUsers(user?.id);
+
+  // Connect WebSocket when component mounts
+  useEffect(() => {
+    if (user && !socketService.connected) {
+      socketService.connect();
+      
+      // Wait a bit for connection, then emit user-join
+      setTimeout(() => {
+        socketService.emit('user-join', {
+          userId: user.id,
+          username: user.username
+        });
+      }, 500);
+    }
+
+    return () => {
+      // Don't disconnect here - let ChatWindow or App handle it
+      // This prevents disconnecting when switching between views
+    };
+  }, [user]);
 
   const loadGreeting = async () => {
     try {
@@ -88,7 +109,6 @@ const HomePage = ({ user, onLogout }) => {
   };
 
   const handleUserClick = (selectedUser) => {
-    console.log('User clicked:', selectedUser);
     setSelectedChatUser(selectedUser);
   };
 
@@ -119,6 +139,7 @@ const HomePage = ({ user, onLogout }) => {
             loading={usersLoading}
             error={usersError}
             onUserClick={handleUserClick}
+            currentUserId={user?.id}
           />
         </aside>
 

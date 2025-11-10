@@ -9,6 +9,17 @@ import * as session from '../../services/session';
 jest.mock('../../services/api');
 jest.mock('../../services/session');
 
+// Mock LoggedInUsersPanel to track props
+jest.mock('../LoggedInUsersPanel', () => {
+  return function MockLoggedInUsersPanel(props) {
+    return (
+      <div data-testid="mock-logged-in-users-panel" data-current-user-id={props.currentUserId}>
+        Mocked LoggedInUsersPanel
+      </div>
+    );
+  };
+});
+
 const mockFetchGreeting = api.fetchGreeting;
 const mockLogoutUser = api.logoutUser;
 const mockClearSession = session.clearSession;
@@ -632,6 +643,24 @@ describe('HomePage', () => {
 
       // Should have data attributes for debugging
       expect(container.firstChild).toHaveAttribute('data-testid', 'homepage-container');
+    });
+  });
+
+  describe('Notification Integration', () => {
+    it('should pass currentUserId to LoggedInUsersPanel for notification tracking', () => {
+      mockFetchGreeting.mockResolvedValueOnce({ message: 'Hello World' });
+
+      const mockUserWithId = {
+        id: '123',
+        username: 'testuser',
+        createdAt: '2025-01-01T00:00:00Z'
+      };
+
+      render(<HomePage user={mockUserWithId} onLogout={mockOnLogout} />);
+
+      // LoggedInUsersPanel should receive currentUserId prop
+      const usersPanel = screen.getByTestId('mock-logged-in-users-panel');
+      expect(usersPanel).toHaveAttribute('data-current-user-id', '123');
     });
   });
 });

@@ -1,5 +1,6 @@
 import React from 'react';
 import './LoggedInUsersPanel.css';
+import { useMessageNotifications } from '../hooks/useMessageNotifications';
 
 /**
  * LoggedInUsersPanel Component
@@ -10,8 +11,11 @@ import './LoggedInUsersPanel.css';
  * @param {boolean} props.loading - Loading state
  * @param {Error|null} props.error - Error state if any
  * @param {Function} props.onUserClick - Optional callback when a user is clicked
+ * @param {string} props.currentUserId - ID of the current user for notification management
  */
-const LoggedInUsersPanel = ({ users, loading, error, onUserClick }) => {
+const LoggedInUsersPanel = ({ users, loading, error, onUserClick, currentUserId }) => {
+  // Use notification hook for real-time message notifications
+  const { notifications, clearNotification } = useMessageNotifications(currentUserId);
   // Render loading state
   if (loading && users.length === 0) {
     return (
@@ -130,9 +134,37 @@ const LoggedInUsersPanel = ({ users, loading, error, onUserClick }) => {
 
   // Handle user click
   const handleUserClick = (user) => {
+    // Clear notifications for this user when clicked (convert to string)
+    if (notifications.has(String(user.id))) {
+      clearNotification(String(user.id));
+    }
+    
     if (onUserClick) {
       onUserClick(user);
     }
+  };
+
+  // Get notification state for a user
+  const getNotificationState = (userId) => {
+    // Convert to string to match the notification service's storage format
+    return notifications.get(String(userId));
+  };
+
+  // Determine CSS class for user item based on notification state
+  const getUserItemClass = (userId) => {
+    const notificationState = getNotificationState(userId);
+    
+    if (!notificationState || notificationState.count === 0) {
+      return 'user-item';
+    }
+
+    // If user has notifications and they're currently blinking
+    if (notificationState.isBlinking) {
+      return 'user-item user-item--has-notification user-item--blinking';
+    }
+
+    // If user has notifications but not currently blinking
+    return 'user-item user-item--has-notification';
   };
 
   return (
@@ -146,11 +178,11 @@ const LoggedInUsersPanel = ({ users, loading, error, onUserClick }) => {
           {users.map((user) => (
             <div
               key={user.id}
-              className="user-item"
+              className={getUserItemClass(user.id)}
               onClick={() => handleUserClick(user)}
               role="button"
               tabIndex={0}
-              onKeyPress={(e) => {
+              onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   handleUserClick(user);
                 }

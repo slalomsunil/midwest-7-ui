@@ -1,0 +1,325 @@
+/**
+ * Notification Styles - CSS animations and states for user notifications
+ * Includes accessibility considerations and reduced motion support
+ */
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .username-blinking {
+    /* Disable animation for users who prefer reduced motion */
+    animation: none !important;
+    /* Still indicate notification with color and weight */
+    color: #ff6b35 !important;
+    font-weight: bold !important;
+  }
+  
+  .username-blinking::after {
+    content: '●' !important;
+    color: #ff6b35 !important;
+    margin-left: 5px !important;
+    font-size: 0.8em !important;
+  }
+}
+
+/* Keyframe animation for blinking effect */
+@keyframes blink {
+  0%, 50% { 
+    opacity: 1; 
+    color: #ff6b35; 
+    font-weight: bold; 
+  }
+  51%, 100% { 
+    opacity: 0.3; 
+    color: #ff6b35; 
+    font-weight: bold; 
+  }
+}
+
+/* Alternative pulse animation for subtle blinking */
+@keyframes pulse {
+  0% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+  50% { 
+    opacity: 0.7; 
+    transform: scale(1.05); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+/* Normal username state - no notifications */
+.username-normal {
+  color: inherit;
+  font-weight: normal;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.username-normal:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Blinking username state - active notification */
+.username-blinking {
+  animation: blink 1s ease-in-out infinite;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  transition: background-color 0.2s ease-in-out;
+  /* Ensure good contrast for accessibility */
+  min-height: 20px;
+  line-height: 1.2;
+}
+
+.username-blinking:hover {
+  background-color: rgba(255, 107, 53, 0.1);
+}
+
+/* Persistent notification state - has unread but not blinking */
+.username-has-notification {
+  color: #ff6b35;
+  font-weight: bold;
+  position: relative;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  transition: all 0.2s ease-in-out;
+}
+
+.username-has-notification:hover {
+  background-color: rgba(255, 107, 53, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Notification indicator dot */
+.username-has-notification::after {
+  content: '●';
+  color: #ff6b35;
+  margin-left: 5px;
+  font-size: 0.8em;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Focus styles for accessibility */
+.username-normal:focus,
+.username-blinking:focus,
+.username-has-notification:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+  background-color: rgba(0, 102, 204, 0.1);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .username-blinking,
+  .username-has-notification {
+    color: #cc3300;
+    border: 1px solid #cc3300;
+  }
+  
+  .username-has-notification::after {
+    color: #cc3300;
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .username-normal {
+    color: #e0e0e0;
+  }
+  
+  .username-normal:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .username-blinking,
+  .username-has-notification {
+    color: #ff8c42;
+  }
+  
+  .username-has-notification::after {
+    color: #ff8c42;
+  }
+  
+  .username-blinking:hover,
+  .username-has-notification:hover {
+    background-color: rgba(255, 140, 66, 0.2);
+  }
+}
+
+/* Mobile-friendly touch targets */
+@media (max-width: 768px) {
+  .username-normal,
+  .username-blinking,
+  .username-has-notification {
+    padding: 8px 12px;
+    min-height: 44px; /* iOS recommended touch target size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Print styles - remove animations and use high contrast */
+@media print {
+  .username-blinking {
+    animation: none !important;
+    color: #000 !important;
+    font-weight: bold !important;
+  }
+  
+  .username-has-notification {
+    color: #000 !important;
+  }
+  
+  .username-has-notification::after {
+    color: #000 !important;
+  }
+}
+
+/* Container for multiple notification indicators */
+.notification-indicators-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+}
+
+.notification-indicators-container .username-normal,
+.notification-indicators-container .username-blinking,
+.notification-indicators-container .username-has-notification {
+  width: 100%;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+/* Badge for notification count (if needed in future) */
+.notification-badge {
+  background-color: #ff6b35;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 0.75em;
+  font-weight: bold;
+  margin-left: 8px;
+  min-width: 16px;
+  text-align: center;
+  line-height: 1;
+}
+
+/* Animation utilities */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.fade-out {
+  animation: fadeOut 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Enhanced Notification Badge for Avatar Overlays */
+.notification-badge-overlay {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ff4444;
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  min-width: 16px;
+  height: 16px;
+  padding: 2px;
+  border: 2px solid white;
+  z-index: 10;
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+/* Badge sizes */
+.notification-badge-overlay--small {
+  min-width: 12px;
+  height: 12px;
+  font-size: 8px;
+  padding: 1px;
+  border-width: 1px;
+}
+
+.notification-badge-overlay--large {
+  min-width: 20px;
+  height: 20px;
+  font-size: 12px;
+  padding: 3px;
+  border-width: 2px;
+}
+
+/* Badge positions */
+.notification-badge-overlay--top-right {
+  top: -4px;
+  right: -4px;
+}
+
+.notification-badge-overlay--top-left {
+  top: -4px;
+  left: -4px;
+}
+
+.notification-badge-overlay--bottom-right {
+  bottom: -4px;
+  right: -4px;
+}
+
+.notification-badge-overlay--bottom-left {
+  bottom: -4px;
+  left: -4px;
+}
+
+/* Badge animation */
+@keyframes badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* Reduce motion for badge animations */
+@media (prefers-reduced-motion: reduce) {
+  .notification-badge-overlay {
+    animation: none;
+  }
+}
