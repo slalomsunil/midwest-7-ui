@@ -66,7 +66,7 @@ class NotificationService {
    * Clear all notifications
    */
   clearAllNotifications() {
-    const count = this.notifications.size;
+    // const count = this.notifications.size; // Removed unused variable
     
     // Clear all timeouts
     for (const userId of this.notifications.keys()) {
@@ -182,4 +182,5 @@ class NotificationService {
 }
 
 // Export singleton instance
-export default new NotificationService();
+const notificationServiceInstance = new NotificationService();
+export default notificationServiceInstance;
